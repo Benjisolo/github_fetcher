@@ -67,7 +67,7 @@ $(document).ready(function () {
     }*/
 
     function searchUsers(username) {
-        $.get("https://api.github.com/search/users?q=" + username + "+in:user&per_page=100",
+        $.get(`https://api.github.com/search/users?q=${username}+in:user&per_page=100`,
             function (data) {
                 data.items.forEach((item) => {
                     // countFollowers(item.login)
