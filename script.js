@@ -36,7 +36,7 @@ $(document).ready(function () {
                 $.each(followingData, function(i, item) {
                     follName = 
                     `<li class="list-group-item d-flex justify-content-between align-items-center">
-                        ${item.login}
+                        <a href="${item.html_url}">${item.login}</a>
                     </li>`
                     $("#followingList").append(follName)
                 })
@@ -46,7 +46,7 @@ $(document).ready(function () {
                     <div class="col-sm-3" style="width: 12rem">
                         <img src="${userData.avatar_url}" class="rounded-circle img-thumbnail img-fluid"/>
                         <h5 class="text-center">${username}</h5>
-                        <a href="${userData.html_url}" class="btn btn-outline-secondary">View Profile</a>
+                        <a href="${userData.html_url}" class="btn btn-outline-primary mx-auto d-block" target="_blank">View Profile</a>
                     </div>
                     <div class="col">
                         <ul class="nav nav-tabs">
@@ -77,9 +77,7 @@ $(document).ready(function () {
                                 <p>Food truck fixie locavore, accusamus mcsweeney's marfa nulla single-origin coffee squid. Exercitation +1 labore velit, blog sartorial PBR leggings next level wes anderson artisan four loko farm-to-table craft beer twee. Qui photo booth letterpress, commodo enim craft beer mlkshk aliquip jean shorts ullamco ad vinyl cillum PBR. Homo nostrud organic, assumenda labore aesthetic magna delectus mollit.</p>
                             </div>
                             <div class="tab-pane fade" id="following">
-                                <ul class="list-group" id="followingList">
-                                
-                                </ul>
+                                <ul class="list-group" id="followingList"></ul>
                             </div>
                         </div>
                     </div>
