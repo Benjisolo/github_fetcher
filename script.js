@@ -4,38 +4,15 @@ $(document).ready(function () {
     const endPoint = "https://api.github.com/search/users"
 
     var user = "";
-    var count = 0;
     var appAuth = `?client_id=${myClient_id}&client_secret=${myClient_secret}`
-/*
-    class GitHubUser {
-        constructor(name, num_followers) {
-            this.name = name, 
-            this.avatar_url = "", 
-            this.num_followers = num_followers, 
-            this.num_following = 0
-        }
-
-        get userName() {return this.name}
-        get avatarUrl() {return this.avatar_url}
-        get numFollowers () {return this.num_followers}
-        get numFollowing () {return this.num_following}
-
-        set setUserName(name) {this.name = name}
-        set setAvatarUrl(avatar_url) {this.avatar_url = avatar_url}
-        set setNumFollowers (num_followers) {this.num_followers = num_followers}
-        set setNumFollowing (num_following) {this.num_following = num_following}
-    }*/
-
     var userlist = []
 
     $("#form").keyup(function (event) {
         var username = $("#username").val();
 
-        // searchUsers(username);
         search2(username)
         // countFollowers(username)
         // fetchUserInfo()
-        // console.log(userlist)
     });
 
     function fetchUserInfo() {
@@ -51,22 +28,74 @@ $(document).ready(function () {
         );
     }
 
-/*
-    function fetchUserInfo() {
-        $.get("user-info",
-            function (textdata, status) {
-                var lines = textdata.split("\n")
-                avatar = ""
-                nbrFollowing = 0
-                $.each(lines, function(l, content) {
-                    countFollowers(content)
-                    userlist[l] = new GitHubUser(content, count)
+    function search2(username) {
+        follName = ""
+        $.get(`https://api.github.com/users/${username}`, function(userData) {
+            $.get(`https://api.github.com/users/${username}/following`, function(followingData) {
+                // console.log(followingData)
+                $.each(followingData, function(i, item) {
+                    follName = 
+                    `<li class="list-group-item d-flex justify-content-between align-items-center">
+                        ${item.login}
+                    </li>`
+                    $("#followingList").append(follName)
                 })
-            }
-        );
-    }*/
+            })
+            user =
+                `<div class="row">
+                    <div class="col-sm-3" style="width: 12rem">
+                        <img src="${userData.avatar_url}" class="rounded-circle img-thumbnail img-fluid"/>
+                        <h5 class="text-center">${username}</h5>
+                        <a href="${userData.html_url}" class="btn btn-outline-secondary">View Profile</a>
+                    </div>
+                    <div class="col">
+                        <ul class="nav nav-tabs">
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#repos">
+                                Public repos
+                                <span class="badge badge-pill badge-info">${userData.public_repos}</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" data-toggle="tab" href="#followers">
+                                Followers
+                                <span class="badge badge-pill badge-success">${userData.followers}</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#following">
+                                Following
+                                <span class="badge badge-pill badge-warning">${userData.following}</span>
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane fade" id="repos">
+                                <p>Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua, retro synth master cleanse. Mustache cliche tempor, williamsburg carles vegan helvetica. Reprehenderit butcher retro keffiyeh dreamcatcher synth. Cosby sweater eu banh mi, qui irure terry richardson ex squid. Aliquip placeat salvia cillum iphone. Seitan aliquip quis cardigan american apparel, butcher voluptate nisi qui.</p>
+                            </div>
+                            <div class="tab-pane fade active show" id="followers">
+                                <p>Food truck fixie locavore, accusamus mcsweeney's marfa nulla single-origin coffee squid. Exercitation +1 labore velit, blog sartorial PBR leggings next level wes anderson artisan four loko farm-to-table craft beer twee. Qui photo booth letterpress, commodo enim craft beer mlkshk aliquip jean shorts ullamco ad vinyl cillum PBR. Homo nostrud organic, assumenda labore aesthetic magna delectus mollit.</p>
+                            </div>
+                            <div class="tab-pane fade" id="following">
+                                <ul class="list-group" id="followingList">
+                                
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            $("#result").html(user);
+        })
+    }
 
+/*
     function searchUsers(username) {
+        $.get(`https://api.github.com/search/users?q=${username}+in:user&per_page=100`);
+    }
+    */
+
+/*
+function searchUsers(username) {
         $.get(`https://api.github.com/search/users?q=${username}+in:user&per_page=100`,
             function (data) {
                 data.items.forEach((item) => {
@@ -103,55 +132,7 @@ $(document).ready(function () {
             }
         );
     }
-
-    function search2(username) {
-        $.get(`https://api.github.com/users/${username}`, function(userData) {
-            $.get(`https://api.github.com/users/${username}/following`, function(followingData) {
-                console.log(followingData)
-            })
-            user =
-                `<div class="row">
-                    <div class="col-sm-3" style="width: 12rem">
-                        <img src="${userData.avatar_url}" class="rounded-circle img-thumbnail img-fluid"/>
-                        <h5 class="text-center">${username}</h5>
-                    </div>
-                    <div class="col">
-                        <ul class="nav nav-tabs">
-                            <li class="nav-item">
-                                <a class="nav-link" data-toggle="tab" href="#repos">
-                                Public repos
-                                <span class="badge badge-pill badge-info">${userData.public_repos}</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link active" data-toggle="tab" href="#followers">
-                                Followers
-                                <span class="badge badge-pill badge-success">${userData.followers}</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-toggle="tab" href="#following">
-                                Following
-                                <span class="badge badge-pill badge-warning">${userData.following}</span>
-                                </a>
-                            </li>
-                        </ul>
-                        <div class="tab-content">
-                            <div class="tab-pane fade" id="repos">
-                                <p>Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua, retro synth master cleanse. Mustache cliche tempor, williamsburg carles vegan helvetica. Reprehenderit butcher retro keffiyeh dreamcatcher synth. Cosby sweater eu banh mi, qui irure terry richardson ex squid. Aliquip placeat salvia cillum iphone. Seitan aliquip quis cardigan american apparel, butcher voluptate nisi qui.</p>
-                            </div>
-                            <div class="tab-pane fade active show" id="followers">
-                                <p>Food truck fixie locavore, accusamus mcsweeney's marfa nulla single-origin coffee squid. Exercitation +1 labore velit, blog sartorial PBR leggings next level wes anderson artisan four loko farm-to-table craft beer twee. Qui photo booth letterpress, commodo enim craft beer mlkshk aliquip jean shorts ullamco ad vinyl cillum PBR. Homo nostrud organic, assumenda labore aesthetic magna delectus mollit.</p>
-                            </div>
-                            <div class="tab-pane fade" id="following">
-                                <div style="width: 12rem"><img src="${userData.avatar_url}" class="rounded-circle img-thumbnail img-fluid"/></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>`;
-            $("#result").html(user);
-        })
-    }
+ */
 
     /*
     function search2(username) {
