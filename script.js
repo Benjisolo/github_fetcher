@@ -1,98 +1,125 @@
 $(document).ready(function () {
     const myClient_id = "Iv1.01a8f535dd4ca2c8"
     const myClient_secret = "bdb0cc9173140424596b65bd38dea4471e3bce3d"
+    const myToken = "782002dfb35cf1fa112878d6e2d84dba706e2cd8"
     const endPoint = "https://api.github.com/search/users"
 
     var user = "";
-    var appAuth = `?client_id=${myClient_id}&client_secret=${myClient_secret}`
+    var appAuth = `client_id=${myClient_id}&client_secret=${myClient_secret}`
     var userlist = []
 
     $("#form").keyup(function (event) {
         var username = $("#username").val();
 
-        search2(username)
+        search(username)
         // countFollowers(username)
         // fetchUserInfo()
     });
 
-    function fetchUserInfo() {
-        $.get("user-info",
+    // function fetchUserInfo() {
+        $.get("user-info2",
             function (textdata, status) {
                 var lines = textdata.split("\n")
                 avatar = ""
                 nbrFollowing = 0
                 $.each(lines, function(l, content) {
-                    userlist[l] = content
+                    search2(content, l)
                 })
             }
         );
-    }
+    // }
 
-    function search2(username) {
+    function search2(username, position) {
         follName = ""
         $.get(`https://api.github.com/users/${username}`, function(userData) {
-            $.get(`https://api.github.com/users/${username}/following`, function(followingData) {
+            $.get(`https://api.github.com/users/${username}/followers?&per_page=100`, function(followersData) {
+                // console.log(followersData)
+                $.each(followersData, function(i, item) {
+                    follName = 
+                    `<li class="list-group-item d-flex justify-content-between align-items-center">
+                        <a href="${item.html_url}">${item.login}</a>
+                    </li>`
+                    $(`#followersList_${position}`).append(follName)
+                })
+            })
+            $.get(`https://api.github.com/users/${username}/following?&per_page=100`, function(followingData) {
                 // console.log(followingData)
                 $.each(followingData, function(i, item) {
                     follName = 
                     `<li class="list-group-item d-flex justify-content-between align-items-center">
                         <a href="${item.html_url}">${item.login}</a>
                     </li>`
-                    $("#followingList").append(follName)
+                    $(`#followingList_${position}`).append(follName)
                 })
-            })
+            })/*
+            $.get(`https://api.github.com/users/${username}/repos_url?&per_page=100`, function(reposData) {
+                // console.log(reposData)
+                $.each(reposData, function(i, item) {
+                    follName = 
+                    `<li class="list-group-item d-flex justify-content-between align-items-center">
+                        <a href="${item.html_url}">${item.login}</a>
+                    </li>`
+                    $("#reposList").append(reposName)
+                })
+            })*/
             user =
                 `<div class="row">
-                    <div class="col-sm-3" style="width: 12rem">
-                        <img src="${userData.avatar_url}" class="rounded-circle img-thumbnail img-fluid"/>
-                        <h5 class="text-center">${username}</h5>
+                    <div class="col-sm-3">
+                        <img src="${userData.avatar_url}" class="rounded-circle img-thumbnail mx-auto"/>
+                        <h5 class="text-center mx-auto">${username}</h5>
                         <a href="${userData.html_url}" class="btn btn-outline-primary mx-auto d-block" target="_blank">View Profile</a>
                     </div>
-                    <div class="col">
+                    <div class="col-sm-9">
                         <ul class="nav nav-tabs">
                             <li class="nav-item">
-                                <a class="nav-link" data-toggle="tab" href="#repos">
+                                <a class="nav-link" data-toggle="tab" href="#repos_${position}">
                                 Public repos
                                 <span class="badge badge-pill badge-info">${userData.public_repos}</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link active" data-toggle="tab" href="#followers">
+                                <a class="nav-link active" data-toggle="tab" href="#followers_${position}">
                                 Followers
                                 <span class="badge badge-pill badge-success">${userData.followers}</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" data-toggle="tab" href="#following">
+                                <a class="nav-link" data-toggle="tab" href="#following_${position}">
                                 Following
                                 <span class="badge badge-pill badge-warning">${userData.following}</span>
                                 </a>
                             </li>
                         </ul>
                         <div class="tab-content">
-                            <div class="tab-pane fade" id="repos">
-                                <p>Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua, retro synth master cleanse. Mustache cliche tempor, williamsburg carles vegan helvetica. Reprehenderit butcher retro keffiyeh dreamcatcher synth. Cosby sweater eu banh mi, qui irure terry richardson ex squid. Aliquip placeat salvia cillum iphone. Seitan aliquip quis cardigan american apparel, butcher voluptate nisi qui.</p>
+                            <div class="tab-pane fade" id="repos_${position}">
+                            <ul class="list-group" id="reposList_${position}" style="height:138px; overflow:auto"></ul>
+                            <a href="https://api.github.com/users/${username}/repos" target="_blank" class="btn btn-outline-danger float-right" id="allReposBtn_${position}" float-right">see all -></a>
                             </div>
-                            <div class="tab-pane fade active show" id="followers">
-                                <p>Food truck fixie locavore, accusamus mcsweeney's marfa nulla single-origin coffee squid. Exercitation +1 labore velit, blog sartorial PBR leggings next level wes anderson artisan four loko farm-to-table craft beer twee. Qui photo booth letterpress, commodo enim craft beer mlkshk aliquip jean shorts ullamco ad vinyl cillum PBR. Homo nostrud organic, assumenda labore aesthetic magna delectus mollit.</p>
+                            <div class="tab-pane fade active show" id="followers_${position}">
+                                <ol class="list-group" id="followersList_${position}" style="height:138px; overflow:auto"></ol>
+                                <a href="https://api.github.com/users/${username}/followers" target="_blank" class="btn btn-outline-danger float-right" id="allFollowersBtn_${position}" float-right">see all -></a>
                             </div>
-                            <div class="tab-pane fade" id="following">
-                                <ul class="list-group" id="followingList"></ul>
+                            <div class="tab-pane fade" id="following_${position}">
+                                <ol class="list-group" id="followingList_${position}" style="height:138px; overflow:auto"></ol>
+                                <a href="https://api.github.com/users/${username}/following" target="_blank" class="btn btn-outline-danger float-right" id="allFollowingBtn_${position}" float-right">see all -></a>
                             </div>
                         </div>
                     </div>
                 </div>`;
-            $("#result").html(user);
+            $("#result").append(user);
         })
     }
-
 /*
     function searchUsers(username) {
-        $.get(`https://api.github.com/search/users?q=${username}+in:user&per_page=100`);
-    }
-    */
+        $.ajax({
+            url: `https://api.github.com/users/${username}`,
+            data: {
+                
+            }
+        })
+    }*/
 
-/*
+
 function searchUsers(username) {
         $.get(`https://api.github.com/search/users?q=${username}+in:user&per_page=100`,
             function (data) {
@@ -130,16 +157,16 @@ function searchUsers(username) {
             }
         );
     }
- */
+ 
 
-    /*
-    function search2(username) {
+    
+    function search(username) {
         $.ajax({
             url: `https://api.github.com/users/${username}`,
-            // data: {
-            //     client_id: myClient_id,
-            //     client_secret: myClient_secret
-            // }
+            data: {
+                client_id: myClient_id,
+                client_secret: myClient_secret
+            }
         }).done(function(user) {
             user =
                 `<div class="card" style="width: 18rem"> 
@@ -153,5 +180,5 @@ function searchUsers(username) {
             $("#result").append(user);
         })
     }
-     */
+    
 });
